@@ -1,5 +1,5 @@
 {
-  "name": "typed-immutable-record",
+  "name": "@rokt33r/typed-immutable-record",
   "version": "0.0.6",
   "description": "Factory for Typed Immutablejs.Record",
   "main": "./dist/index.js",

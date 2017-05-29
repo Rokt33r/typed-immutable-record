@@ -1,19 +1,14 @@
-import {
-  Map,
-  Iterable,
-} from 'immutable';
-
-
+import { Map, Iterable } from 'immutable';
 /**
  * Interface that inherit from Immutable.Map that overrides all methods that
  * would return a new version of Immutable.Map itself to return <T> instead.
  * Although it is possible to do, this interface is not currently
- * supports a different Immutable.Map rather than Map<string, any>. Thus
+ * supports a different Immutable.Map rather than Map<keyof T, any>. Thus
  * all TypedRecord<T> operators will have <any> as the object type and also
  * notSetValue argument type when performing functional programming changes.
- * Key will always be a string.
+ * Key will always be a keyof T.
  *
- * Map<string, any> is a very flexible combination that supports basically
+ * Map<keyof T, any> is a very flexible combination that supports basically
  * everything. However another interface can be created between TypedRecord
  * and Immutable.Map to support the generic Map arguments <K> and <V> or this
  * interface can require more generic arguments in order to support K, V.
@@ -31,42 +26,30 @@ import {
  *
  * Examples in test file: 'test/typed.record.test.ts'
  */
-export interface TypedRecord<T extends TypedRecord<T>>
-  extends Map<string, any> {
-
-  set: (prop: string, val: any) => T;
-  delete: (key: string) => T;
-  remove: (key: string) => T;
-  clear: () => T;
-  update: {
-    (updater: (value: T) => any): T;
-    (key: string, updater: (value: any) => any): T;
-    (key: string, notSetValue: any, updater: (value: any) => any): T;
-  };
-  merge: (obj: any) => T;
-  mergeWith: (
-    merger: (previous?: any, next?: any, key?: string) => any,
-    obj: any
-  ) => T;
-  mergeDeep: (obj: any) => T;
-  mergeDeepWith: (
-    merger: (previous?: any, next?: any, key?: string) => any,
-    obj: any
-  ) => T;
-  setIn: (keyPath: any[] | Iterable<any, any>, value: any) => T;
-  deleteIn: (keyPath: Array<any> | Iterable<any, any>) => T;
-  removeIn: (keyPath: Array<any> | Iterable<any, any>) => T;
-  updateIn: {
-    (keyPath: any[] | Iterable<any, any>, updater: (value: any) => any): T;
-    (
-      keyPath: any[] | Iterable<any, any>,
-      notSetValue: any,
-      updater: (value: any) => any
-    ): T
-  };
-  mergeIn: (keyPath: any[] | Iterable<any, any>, obj: any) => T;
-  mergeDeepIn: (keyPath: any[] | Iterable<any, any>, obj: any) => T;
-  withMutations: (mutator: (mutable: T) => any) => T;
-  asMutable: () => T;
-  asImmutable: () => T;
-};
+export interface TypedRecord<T extends TypedRecord<T>> extends Map<keyof T, T[keyof T]> {
+    set: <K extends keyof T>(prop: K, val: T[K]) => T;
+    delete: (key: keyof T) => T;
+    remove: (key: keyof T) => T;
+    clear: () => T;
+    update: {
+        (updater: (value: T) => T): T;
+        <K extends keyof T>(key: K, updater: (value: T[K]) => T): T;
+        <K extends keyof T>(key: K, notSetValue: T[K], updater: (value: any) => any): T;
+    };
+    merge: (obj: any) => T;
+    mergeWith: (merger: (previous?: any, next?: any, key?: keyof T) => any, obj: any) => T;
+    mergeDeep: (obj: any) => T;
+    mergeDeepWith: (merger: (previous?: any, next?: any, key?: keyof T) => any, obj: any) => T;
+    setIn: (keyPath: any[] | Iterable<any, any>, value: any) => T;
+    deleteIn: (keyPath: Array<any> | Iterable<any, any>) => T;
+    removeIn: (keyPath: Array<any> | Iterable<any, any>) => T;
+    updateIn: {
+        (keyPath: any[] | Iterable<any, any>, updater: (value: any) => any): T;
+        (keyPath: any[] | Iterable<any, any>, notSetValue: any, updater: (value: any) => any): T;
+    };
+    mergeIn: (keyPath: any[] | Iterable<any, any>, obj: any) => T;
+    mergeDeepIn: (keyPath: any[] | Iterable<any, any>, obj: any) => T;
+    withMutations: (mutator: (mutable: T) => any) => T;
+    asMutable: () => T;
+    asImmutable: () => T;
+}
